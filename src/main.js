@@ -4,9 +4,16 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import routes from './routes.ts';
 
+//importing horizontal nav bar for global usage
+import HorizontalNavBar from './components/nav-bar/Horizontal.vue'
+
 //importing CKEditor
 import CKEditor from 'ckeditor4-vue';
 
+//[**GLOBAL COMPONENTS**]//
+//REMOVING OR MODIFYING THIS SECTION MAY AFFECT MOST OF THE PAGES 
+//registering horizontal nav bar
+Vue.component('horizontal-nav-bar', HorizontalNavBar)
 Vue.use(CKEditor);
 Vue.use(Vuetify)
 

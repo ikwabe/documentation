@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 const routes = [
     {
         name:'Home',
-        component:() => import("./components/document-settings/Dashboard.vue"),
+        component:() => import("./components/document-settings/ComposeDocumentation.vue"),
         path:'/',
         metadata:{allowed:'admin'}
     }
