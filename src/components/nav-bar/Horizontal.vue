@@ -32,11 +32,21 @@
     </v-app-bar>
 
     <v-navigation-drawer app permanent dark color="primary">
-   
-      <!--Menu Buttons -->
-      <v-expansion-panels :hover="true" flat tile v-model="panel" multiple>
-        
-      </v-expansion-panels>
+   <v-card-title class="white--text">
+     Documentation
+   </v-card-title>
+    <v-treeview
+    hoverable
+    :items="menuoption"
+    activatable
+    color="white"
+    open-on-click
+    transition
+  >
+  
+  
+  </v-treeview>
+
     </v-navigation-drawer>
 </div>
  
@@ -47,26 +57,16 @@ export default {
 data:()=>({
     username:'Shedrack Ikwabe',
     panel:null,
-
-  
 }),
+
 props: {
     //this prop help on the active classess for exapansion panels. For every navigation state changes
     state: {
       type: String,
       default: "customer",
     },
-    //options for selected menu. This prop change color for active menu option
-    //the options are
-    //*********************//
-    //ded - for deduction list option
-    //new-cus for add new customer option
-    //upload for upload CSV to AWS option
-    //********************//
-    menuoption: {
-      type: String,
-      default: "cus",
-    },
+    //menu items
+    menuoption: Array,
 
     //page_tittle option
     //this will displaye the page_tittle of the form loading this component
@@ -74,6 +74,8 @@ props: {
       type: String,
       default: "",
     },
+
+
   },
 methods:{
     logOut(){

@@ -17,6 +17,9 @@ Vue.component('horizontal-nav-bar', HorizontalNavBar)
 Vue.use(CKEditor);
 Vue.use(Vuetify)
 
+//global fields rules
+//used for input validation 
+window.valueRules = [(v) => !!v || "Value is required", (v) => !!String(v).trim() || 'Do not use white spaces as value']
 
 Vue.config.productionTip = false
 
