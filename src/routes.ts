@@ -7,8 +7,15 @@ const routes = [
     {
         name:'Home',
         component:() => import("./components/document-settings/ComposeDocumentation.vue"),
-        path:'/',
+        path:'/create-documentation',
         metadata:{allowed:'admin'}
+    },
+
+    {
+        name:"Documentation",
+        component:()=> import('./components/document-view/ViewDocumentation.vue'),
+        path:'/',
+        metadata:{allowed:'all'}
     }
 ]
 

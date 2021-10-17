@@ -153,7 +153,6 @@
                 color="red"
               >
                 {{ snacktext }}
-
                 <template v-slot:action="{ attrs }">
                   <v-btn dark icon v-bind="attrs" @click="snackbar = false">
                     <v-icon>mdi-close</v-icon>
@@ -169,6 +168,7 @@
 </template>
 
 <script>
+import facker from '../util/facker.ts'
 export default {
   data: () => ({
     items: [],
@@ -176,7 +176,9 @@ export default {
     valid: true,
 
     editorConfig: {
-      // The configuration of the editor.
+      // filebrowserUploadMethod : 'form',
+      // filebrowserUploadUrl: './upload.php',
+      // filebrowserBrowseUrl:'/assets/images'
     },
 
     //for snackbar
@@ -186,16 +188,14 @@ export default {
 
     //an object for holding new documentation info
     new_documentation: {
+      user_id:1,
       department_id: null,
       title: null,
       content: null,
       sections: [],
     },
     departments: [
-      { text: "Software Department", value: 1 },
-      { text: "IT Department", value: 2 },
-      { text: "SCM Department", value: 3 },
-      { text: "CS Department", value: 4 },
+      
     ],
   }),
   methods: {
@@ -205,11 +205,12 @@ export default {
 
     saveDocumentation() {
       if (this.validateForm()) {
-        window.localStorage.setItem(
-          "documentation",
-          JSON.stringify(this.new_documentation)
-        );
-        console.log(this.new_documentation);
+        facker.saveDocumentation(this.new_documentation).then(res=>{
+          console.log(res.message)
+          facker.getDocumentationMenu().then(res=>{
+        this.items = res.data
+    })
+        })
       } else {
         this.snacktext = "Make sure you fill all the necessary fields";
 
@@ -239,39 +240,15 @@ export default {
     },
   },
   created() {
-    if (window.localStorage.getItem("documentation")) {
-      let children = [];
-      let menu = JSON.parse(window.localStorage.getItem("documentation"));
 
-      if (menu.sections) {
-        menu.sections.forEach((element) => {
-          if (element.sub_section) {
-            let subsec = [];
-            element.sub_section.forEach((e) => {
-              subsec.push({
-                id: element.sub_section.indexOf(e) + 1,
-                name: e.title,
-              });
-            });
+    facker.getDepartment().then(res=>{
+     this.departments = res.data
+    })
 
-            children.push({
-              id: menu.sections.indexOf(element) + 1,
-              name: element.title,
-              children: subsec,
-            });
-          }
-        });
-
-        this.items.push(
-
-          { id:1, name:"Software Departiment", children:[{      id:1, name: menu.title, children:children}]},
-          { id:2, name:"IT Departiment", children:[{      id:1, name: menu.title, children:children}]}
-
-        )
-      }
-
-      
-    }
+    facker.getDocumentationMenu().then(res=>{
+      this.items = res.data
+    })
+    
   },
 };
 </script>
