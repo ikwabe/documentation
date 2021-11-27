@@ -68,14 +68,12 @@ export default {
     async getDocumentationMenu() {
         let menu = [];
         if (window.localStorage.getItem("docnumber")) {
-            
             for (let i = 1; i <= Number(window.localStorage.getItem("docnumber")); i++)
                 if (window.localStorage.getItem("documentation" + i)) {
                     let deptname = departments.find(dept => dept.value == Number(JSON.parse(window.localStorage.getItem("documentation" + i)).department_id))
                     let findDept = menu.find(el => el.id == deptname.value);
                     if (findDept){
                         let child = menu[menu.indexOf(findDept)].children;
-                        
                         if(child)
                         menu[menu.indexOf(findDept)].children.push({ doc_index:i-1, id: child.length+i, name: JSON.parse(window.localStorage.getItem("documentation" + i)).title })
                         else

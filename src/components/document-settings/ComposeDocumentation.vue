@@ -120,11 +120,14 @@
                         >
                       </div>
                     </v-row>
+                    
                     <ckeditor
+                      
                       v-model="subsect.content"
                       :config="editorConfig"
                       :rules="valueRules"
                     ></ckeditor>
+                  
                   </v-card-text>
                 </div>
                 <v-row class="mt-3">
@@ -171,15 +174,15 @@
 import facker from '../util/facker.ts'
 export default {
   data: () => ({
+    editorConfig: {
+      contentsCss: [
+        'http://cdn.ckeditor.com/4.17.1/full-all/contents.css',
+        'https://ckeditor.com/docs/ckeditor4/4.17.1/examples/assets/css/classic.css'
+      ],
+    },
     items: [],
     valueRules: window.valueRules,
     valid: true,
-
-    editorConfig: {
-      // filebrowserUploadMethod : 'form',
-      // filebrowserUploadUrl: './upload.php',
-      // filebrowserBrowseUrl:'/assets/images'
-    },
 
     //for snackbar
     snackbar: false,

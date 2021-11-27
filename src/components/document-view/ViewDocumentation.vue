@@ -37,12 +37,17 @@
       ></v-navigation-drawer
     >
     <v-main>
+      
       <v-container>
-      <v-col  v-html="content">
+        <center>
+      <v-col cols="12" sm="10" lg="8" md="8">
+      <v-col align="left"  v-html="content">
 
       </v-col>
       <v-col v-for="(sect, index) in sections" :key="index" v-html="sect.content">
       </v-col>
+      </v-col>
+        </center>
       </v-container>
     </v-main>
     
