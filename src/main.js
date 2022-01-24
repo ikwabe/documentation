@@ -15,10 +15,13 @@ Vue.prototype.$axios = axios;
 axios.defaults.headers = { 'Authorization': "Bearer " + window.localStorage.getItem('token') }
     //axios.defaults.headers = { 'Authorization': "Basic " + process.env.VUE_APP_ACCESS_TOKEN }
 
-var base_url = window.location.host;
+var base_url = "127.0.0.1:8001";
+//window.location.host; //http://127.0.0.1:8000
 window.api_url = "http://" + base_url + "/api/v1/";
 window.site_url = "http://" + base_url;
 window.img_url = "http://" + base_url;
+window.username = '';
+window.dept_id = '';
 
 //[**GLOBAL COMPONENTS**]//
 //REMOVING OR MODIFYING THIS SECTION MAY AFFECT MOST OF THE PAGES 
@@ -35,6 +38,30 @@ Vue.config.productionTip = false
 
 new Vue({
     router: routes,
-    vuetify: new Vuetify(),
+    vuetify: new Vuetify( //***[START THEME CUSTOMIZE]***//
+        {
+            theme: {
+                themes: {
+                    light: {
+                        primary: '#00205B',
+                        secondary: '#005eb8',
+                        accent: '#b1deee',
+                        error: '#db0025',
+                        success: '#0fae6f',
+                        active: '#ffde00'
+                    },
+                    dark: {
+                        primary: '#00205B',
+                        secondary: '#005eb8',
+                        accent: '#b1deee',
+                        error: '#db0025',
+                        success: '#0fae6f',
+                        active: '#ffde00'
+                    }
+                },
+            },
+        },
+        //***[END THEME CUSTOMIZE]***//
+    ),
     render: h => h(App),
 }).$mount('#app')

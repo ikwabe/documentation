@@ -4,6 +4,7 @@
   
       <h3 class="ml-4 hide-on-mobile" style="color: #0847a9">{{ page_tittle }}</h3>
  <v-spacer></v-spacer>
+ 
       <v-menu
         transition="scale-transition"
         offset-y
@@ -29,6 +30,7 @@
    <v-card-title class="white--text">
      Documentation
    </v-card-title>
+
   <v-treeview
     hoverable
     :items="menuoption"
@@ -43,6 +45,18 @@
   </v-treeview>
 
     </v-navigation-drawer>
+    <v-dialog persistent v-model="overlay">
+      <v-row justify="center">
+        <div class="col-10 col-md-6 col-sm-8 col-lg-6">
+          <v-progress-linear
+            color="primary"
+            indeterminate
+            rounded
+            height="10"
+          ></v-progress-linear>
+        </div>
+      </v-row>
+    </v-dialog>
 </div>
  
 </template>
@@ -50,15 +64,16 @@
 <script>
 export default {
 data:()=>({
-    username:'Shedrack Ikwabe',
+    username:window.username,
     panel:null,
+    overlay: false,
 }),
 
 props: {
     //this prop help on the active classess for exapansion panels. For every navigation state changes
     state: {
       type: String,
-      default: "customer",
+      default: "doc",
     },
     //menu items
     menuoption: Array,
@@ -73,7 +88,29 @@ props: {
   },
 methods:{
     logOut(){
-      window.location.href = '/'
+     let url = window.api_url + "logout";
+     
+      this.overlay = true;
+     
+      this.$axios
+        .post(url)
+        .then((response) => {
+          if (response.data.success) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("name");
+            localStorage.removeItem("dept_id");
+          
+            window.location.href = "/";
+          }
+        
+        })
+        .catch(() => {
+         localStorage.removeItem("token");
+            localStorage.removeItem("name");
+            localStorage.removeItem("dept_id");
+          window.location.href = "/";
+          this.overlay = false;
+        });
     },
     showOption:function(e){
       console.log(e);

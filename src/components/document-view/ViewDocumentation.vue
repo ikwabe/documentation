@@ -1,27 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar app elevate-on-scroll clipped-right color="white">
-      <h3 class="ml-4 hide-on-mobile" style="color: #0847a9">
-        {{ page_tittle }} Documentation
-      </h3>
-      <v-spacer></v-spacer>
-      <v-menu 
-      transition="scale-transition"
-        offset-y
-        bottom
-        max-height="300"
-        
-        >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn v-on="on" v-bind="attrs" color="purple" dark class="menu" elevation="0">Download Doc <v-spacer></v-spacer><v-icon>mdi-menu-down</v-icon></v-btn>
-
-        </template>
-        <v-btn block elevation="0" class="menu" tile><v-icon>mdi-file-pdf-outline</v-icon> PDF format <v-spacer></v-spacer></v-btn>
-        <v-btn block elevation="0" class="menu" tile><v-icon>mdi-code-braces</v-icon> HTML format<v-spacer></v-spacer></v-btn>
-      </v-menu>
-    </v-app-bar>
+    
+    <horizontal-nav-bar
+      :page_tittle="'View Documentation'"
+      :menuoption="items"
+    ></horizontal-nav-bar>
     <v-navigation-drawer app permanent dark color="primary">
       <v-card-title class="white--text"> Documentation </v-card-title>
+         <v-btn block href="/create-documentation"  color="purple" tile dark class="menu"> <v-icon>mdi-plus</v-icon> Create Documentation</v-btn>
       <v-treeview
         hoverable
         :items="items"
@@ -39,8 +25,25 @@
     <v-main>
       
       <v-container>
+        <v-col align="end" v-if="documents.length > 0">
+        <v-menu 
+      transition="scale-transition"
+        offset-y
+        bottom
+        max-height="300"
+        
+        >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn v-on="on" v-bind="attrs" color="purple" dark class="menu" elevation="0">Download Doc <v-spacer></v-spacer><v-icon>mdi-menu-down</v-icon></v-btn>
+
+        </template>
+        <v-btn block elevation="0" class="menu" tile><v-icon>mdi-file-pdf-outline</v-icon> PDF format <v-spacer></v-spacer></v-btn>
+        <v-btn block elevation="0" class="menu" tile><v-icon>mdi-code-braces</v-icon> HTML format<v-spacer></v-spacer></v-btn>
+      </v-menu>
+        </v-col>
         <center>
       <v-col cols="12" sm="10" lg="8" md="8">
+        
       <v-col align="left"  v-html="content">
 
       </v-col>
