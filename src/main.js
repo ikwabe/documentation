@@ -15,7 +15,7 @@ Vue.prototype.$axios = axios;
 axios.defaults.headers = { 'Authorization': "Bearer " + window.localStorage.getItem('token') }
     //axios.defaults.headers = { 'Authorization': "Basic " + process.env.VUE_APP_ACCESS_TOKEN }
 
-var base_url = "127.0.0.1:8001";
+var base_url = "127.0.0.1:8000";
 //window.location.host; //http://127.0.0.1:8000
 window.api_url = "http://" + base_url + "/api/v1/";
 window.site_url = "http://" + base_url;
