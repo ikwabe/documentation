@@ -5,6 +5,7 @@ import 'vuetify/dist/vuetify.min.css'
 import routes from './routes.ts';
 import axios from "axios"
 
+
 //importing horizontal nav bar for global usage
 import HorizontalNavBar from './components/nav-bar/Horizontal.vue'
 
@@ -29,6 +30,7 @@ window.dept_id = '';
 Vue.component('horizontal-nav-bar', HorizontalNavBar)
 Vue.use(CKEditor);
 Vue.use(Vuetify)
+
 
 //global fields rules
 //used for input validation 

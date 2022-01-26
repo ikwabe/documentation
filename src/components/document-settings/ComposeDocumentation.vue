@@ -4,8 +4,41 @@
       :page_tittle="'Prepare Documentation'"
       :menuoption="items"
     ></horizontal-nav-bar>
-    <v-main>
-      <v-col v-if="!isLoading">
+     <v-navigation-drawer app dark color="primary">
+      <v-card-title class="white--text"> Documentation </v-card-title>
+     
+      <v-treeview
+        hoverable
+        :items="menucontent"
+        item-children="document"
+        activatable
+        color="white"
+        open-on-click
+        return-object
+        transition
+        @click.stop=""
+      >
+        <template slot="label" slot-scope="{ item }">
+          <a style="color: white" @click="showItem(item)">{{ item.name }}</a>
+        </template></v-treeview
+      ></v-navigation-drawer
+    >
+    <v-dialog persistent v-model="overlay">
+          <v-row justify="center">
+            <div class="col-10 col-md-6 col-sm-8 col-lg-6">
+              <v-progress-linear
+                color="primary"
+                indeterminate
+                rounded
+                height="10"
+              ></v-progress-linear>
+            </div>
+          </v-row>
+        </v-dialog>
+    <v-main class="main">
+      
+        <div>
+      <v-col v-if="!isLoading" class="other-pannel">
         <v-form ref="form" @submit.prevent="saveDocumentation">
           <v-card tile>
             <v-card-text>
@@ -193,15 +226,46 @@
           </div>
         </v-form>
       </v-col>
-      <center v-else>
+      <center v-else class="other-pannel">
         <v-progress-circular  indeterminate color="primary" ></v-progress-circular>
       </center>
+        </div>
+        <div class="col-12 col-md-6 col-lg-6 search-panel">
+        <v-card-text>
+          <v-text-field
+            light
+            solo
+            v-model="search"
+            dense
+            placeholder="Search document"
+            append-icon="mdi-magnify"
+            hide-details=""
+            style="
+              border-bottom-left-radius: 0px;
+              border-bottom-right-radius: 0px;
+            "
+            @keyup="searchDocument"
+          ></v-text-field>
+          <v-card tile v-show="searched.length > 0" elevation="1">
+            <v-btn
+              class="menu"
+              @click="showItem(doc)"
+              v-for="(doc, index) in searched"
+              :key="index"
+              text
+              block
+              tile
+              >{{ doc.name }} <v-spacer></v-spacer
+            ></v-btn>
+          </v-card>
+        </v-card-text>
+        </div>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import facker from "../util/facker.ts";
+
 export default {
   data: () => ({
     editorConfig: {
@@ -214,11 +278,14 @@ export default {
     valueRules: window.valueRules,
     valid: true,
     isLoading: false,
-
+    overlay:true,
     //for snackbar
     snackbar: false,
     snacktext: null,
+    search: null,
+    searched: [],
     timeout: 5000,
+    menucontent: [],
     documentation_title: null,
     department_id: window.dept_id,
     documentation: [
@@ -232,11 +299,41 @@ export default {
     departments: [],
   }),
   methods: {
+    showItem(item) {
+      if (item) {
+        if (item.doc_index >= 0) {
+          this.view_document = item;
+          this.searched = [];
+          // this.page_tittle = item.name;
+          // this.content = this.documents[item.doc_index].content;
+          // this.selected_index = item.doc_index;
+          // this.sections = this.documents[this.selected_index].sections;
+        }
+      }
+    },
     validateForm() {
       return this.$refs.form.validate();
     },
     showid(e) {
       console.log(e);
+    },
+    getDocuments() {
+     
+      this.overlay = true;
+      let url = window.api_url + "get-documents";
+      this.$axios
+        .get(url)
+        .then((response) => {
+          if (response.data.success) {
+            this.documents = response.data.payload;
+            this.menucontent = this.documents;
+            this.overlay = false;
+          }
+        })
+        .catch(() => {
+        
+          this.overlay = false;
+        });
     },
     saveDocumentation() {
       if (this.validateForm()) {
@@ -264,7 +361,25 @@ export default {
     removeSection(index) {
       this.documentation[index].sections.splice(index, 1);
     },
+searchDocument(e) {
+      this.searched = [];
+      let documents = [];
+      this.menucontent.forEach((element) => {
+        if (element.document != null && element.document.length > 0) {
+          element.document.forEach((el) => {
+            documents.push(el);
+          });
+        }
+      });
 
+      this.searched = documents.filter((doc) =>
+        String(doc.name)
+          .toLowerCase()
+          .includes(String(e.target._value).toLowerCase())
+      );
+      if (String(e.target._value) == null || String(e.target._value) == "")
+        this.searched = [];
+    },
     addSubSection(index, i) {
       this.documentation[index].sections[i].sub_section.push({
         title: null,
@@ -311,10 +426,7 @@ export default {
     },
   },
   created() {
-    //this.getDepartiments();
-    facker.getDocumentationMenu().then((res) => {
-      this.items = res.data;
-    });
+ this.getDocuments();
   },
 };
 </script>
@@ -333,4 +445,20 @@ export default {
 .sub-section-container {
   background-color: rgba(240, 23, 70, 0.1);
 }
+
+
+.main {
+  position: relative;
+}
+.search-pannel {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+.other-pannel {
+  position: absolute;
+  left: 10px;
+  top: 10%;
+}
+
 </style>

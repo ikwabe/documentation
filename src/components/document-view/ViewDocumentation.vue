@@ -33,22 +33,25 @@
         </template></v-treeview
       ></v-navigation-drawer
     >
-    <v-main>
-      <v-container>
-        <div class="col-12 col-md-6 col-lg-6">
-          <v-card-text>
-            <v-text-field
-              outlined
-              light
-              v-model="search"
-              dense
-              placeholder="Search"
-              hide-details=""
-            ></v-text-field>
-          </v-card-text>
-        </div>
+    <v-main class="main">
+      <v-container class="other-pannel">
+        <v-dialog persistent v-model="overlay">
+          <v-row justify="center">
+            <div class="col-10 col-md-6 col-sm-8 col-lg-6">
+              <v-progress-linear
+                color="primary"
+                indeterminate
+                rounded
+                height="10"
+              ></v-progress-linear>
+            </div>
+          </v-row>
+        </v-dialog>
+
         <v-col align="end" v-if="view_document">
+      
           <v-menu
+         
             transition="scale-transition"
             offset-y
             bottom
@@ -66,7 +69,7 @@
                 ><v-icon>mdi-menu-down</v-icon></v-btn
               >
             </template>
-            <v-btn block elevation="0" class="menu" tile
+            <v-btn block elevation="0" @click="generateReport" class="menu" tile
               ><v-icon>mdi-file-pdf-outline</v-icon> PDF format
               <v-spacer></v-spacer
             ></v-btn>
@@ -74,6 +77,17 @@
               ><v-icon>mdi-code-braces</v-icon> HTML format<v-spacer></v-spacer
             ></v-btn>
           </v-menu>
+          <v-progress-circular
+      :rotate="90"
+      :size="40"
+      :width="5"
+      v-if="value > 0 && value <= 99"
+      :value="value"
+      color="purple"
+      class="ml-3"
+    >
+      {{ value }}
+    </v-progress-circular>
         </v-col>
 
         <v-col v-if="view_document" cols="12" sm="10" lg="8" md="8">
@@ -95,6 +109,75 @@
 
         <v-col v-else align="left" v-html="content"> </v-col>
       </v-container>
+      <div class="col-12 col-md-6 col-lg-6 search-panel">
+        <v-card-text>
+          <v-text-field
+            light
+            solo
+            v-model="search"
+            dense
+            placeholder="Search document"
+            append-icon="mdi-magnify"
+            hide-details=""
+            style="
+              border-bottom-left-radius: 0px;
+              border-bottom-right-radius: 0px;
+            "
+            @keyup="searchDocument"
+          ></v-text-field>
+          <v-card tile v-show="searched.length > 0" elevation="1">
+            <v-btn
+              class="menu"
+              @click="showItem(doc)"
+              v-for="(doc, index) in searched"
+              :key="index"
+              text
+              block
+              tile
+              >{{ doc.name }} <v-spacer></v-spacer
+            ></v-btn>
+          </v-card>
+        </v-card-text>
+        <vue-html2pdf
+          :show-layout="false"
+          :float-layout="true"
+          :enable-download="false"
+          :preview-modal="true"
+          :paginate-elements-by-height="1400"
+          :filename="view_document == null ? 'no name' : view_document.name"
+          :pdf-quality="2"
+          :manual-pagination="false"
+          pdf-format="a4"
+          
+          :margin="5"
+          @progress="onProgress($event)"
+          @hasStartedGeneration="hasStartedGeneration()"
+          @hasGenerated="hasGenerated($event)"
+          ref="html2Pdf"
+        >
+          <section v-if="view_document" slot="pdf-content">
+            <!-- PDF Content Here -->
+            <v-card-text>
+              <v-col
+                v-for="(sect, index) in view_document.content"
+                :key="index"
+               
+              >
+                <v-col v-html="sect.contents"></v-col>
+                <v-col v-for="(sect2, index2) in sect.sections" :key="index2">
+                  <v-col class="ml-3" v-html="sect2.contents"></v-col>
+                  <v-col
+                    v-for="(sect3, index3) in sect2.sub_sections"
+                    :key="index3"
+                  >
+                    <v-col class="ml-4" v-html="sect3.contents"></v-col>
+                  </v-col>
+                </v-col>
+              </v-col>
+            </v-card-text>
+          </section>
+        </vue-html2pdf>
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -102,12 +185,16 @@
 
 <script>
 // import facker from "../util/facker.ts";
+import VueHtml2pdf from "vue-html2pdf";
 export default {
   data: () => ({
     search: null,
     username: "Shedrack Ikwabe",
     panel: null,
+    value:0,
     documents: [],
+    searched: [],
+    overlay: false,
     menucontent: [],
     page_tittle: "",
     selected_index: 0,
@@ -120,8 +207,8 @@ export default {
     showItem(item) {
       if (item) {
         if (item.doc_index >= 0) {
-          console.log(item);
           this.view_document = item;
+          this.searched = [];
           // this.page_tittle = item.name;
           // this.content = this.documents[item.doc_index].content;
           // this.selected_index = item.doc_index;
@@ -135,7 +222,7 @@ export default {
 
     getDocuments() {
       this.isLoading = true;
-
+      this.overlay = true;
       let url = window.api_url + "get-documents";
       this.$axios
         .get(url)
@@ -143,12 +230,42 @@ export default {
           if (response.data.success) {
             this.documents = response.data.payload;
             this.menucontent = this.documents;
+            this.overlay = false;
           }
         })
         .catch(() => {
           this.isLoading = false;
+          this.overlay = false;
         });
     },
+    searchDocument(e) {
+      this.searched = [];
+      let documents = [];
+      this.menucontent.forEach((element) => {
+        if (element.document != null && element.document.length > 0) {
+          element.document.forEach((el) => {
+            documents.push(el);
+          });
+        }
+      });
+
+      this.searched = documents.filter((doc) =>
+        String(doc.name)
+          .toLowerCase()
+          .includes(String(e.target._value).toLowerCase())
+      );
+      if (String(e.target._value) == null || String(e.target._value) == "")
+        this.searched = [];
+    },
+    onProgress:function(e){
+      this.value = e;
+    },
+    generateReport() {
+      this.$refs.html2Pdf.generatePdf();
+    },
+  },
+  components: {
+    VueHtml2pdf,
   },
   created() {
     this.getDocuments();
@@ -170,5 +287,18 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.main {
+  position: relative;
+}
+.search-pannel {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+.other-pannel {
+  position: absolute;
+  left: 10px;
+  top: 10%;
+}
 </style>

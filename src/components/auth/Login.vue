@@ -145,10 +145,10 @@ export default {
   
   <style scoped>
 .main {
-  background-image: url("/background.jpg");
+  background-image: url("/deskback.jpg");
   background-size: cover;
-  filter: blur(5px);
-  -webkit-filter: blur(5px);
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
   height: 100%;
   position: relative;
   /*box-shadow: inset 0 0 0 1000px rgba(144,19,254,0.5);
@@ -159,8 +159,16 @@ background: radial-gradient(circle, rgba(176,113,238,0.49343487394957986) 0%, rg
 }
 .login {
   position: absolute;
-  top: 30%;
+  top: 20%;
   width: 100%;
+}
+
+@media screen and (max-width:900px) {
+  .main {
+  background-image: url("/mobileback.jpg");
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
+}
 }
 </style>
  
