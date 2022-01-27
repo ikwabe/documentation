@@ -7,7 +7,7 @@ ckfinder
 # local env files
 .env.local
 .env.*.local
-
+public/tz-bbd-website
 # Log files
 npm-debug.log*
 yarn-debug.log*
