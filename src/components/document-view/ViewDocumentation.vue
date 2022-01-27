@@ -201,7 +201,7 @@ export default {
     sections: [],
     view_document: null,
     items: [],
-    content: "<h4>No document to display</h4>",
+    content: "<h4>Select/Search document to view</h4>",
   }),
   methods: {
     showItem(item) {
@@ -270,19 +270,10 @@ export default {
   created() {
     this.getDocuments();
 
-    // facker.getDocumentationMenu().then((res) => {
-    //   if (res && res.data) this.items = res.data;
-    // });
-
-    // facker.getDocumentations().then((res) => {
-    //   if (res && res.data) {
-    //     this.documents = res.data;
-    //     this.content = res.data[this.selected_index].content;
-    //     this.page_tittle = res.data[this.selected_index].title;
-
-    //     this.sections = this.documents[this.selected_index].sections;
-    //   }
-    // });
+    if (JSON.parse(localStorage.getItem("view-document"))) {
+      this.view_document = JSON.parse(localStorage.getItem("view-document"));
+      localStorage.setItem("view-document", null);
+    }
   },
 };
 </script>

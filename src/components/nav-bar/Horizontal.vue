@@ -26,25 +26,7 @@
         </v-btn>
       </v-menu>
     </v-app-bar>
-    <v-navigation-drawer app permanent dark color="primary">
-   <v-card-title class="white--text">
-     Documentation
-   </v-card-title>
-
-  <v-treeview
-    hoverable
-    :items="menuoption"
-    activatable
-    color="white"
-    open-on-click
-    transition
-    @update:active="showOption"
-  >
-
-
-  </v-treeview>
-
-    </v-navigation-drawer>
+    
     <v-dialog persistent v-model="overlay">
       <v-row justify="center">
         <div class="col-10 col-md-6 col-sm-8 col-lg-6">

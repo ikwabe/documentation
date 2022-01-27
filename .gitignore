@@ -3,7 +3,7 @@
 /dist
 .env
 src/assets/images/
-
+ckfinder
 # local env files
 .env.local
 .env.*.local
