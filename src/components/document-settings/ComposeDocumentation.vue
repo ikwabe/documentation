@@ -103,12 +103,19 @@
                     >Remove</v-btn
                   >
                 </div>
-                <ckeditor
+
+                <editor
+                  api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
                   v-model="doc.content"
-                 
+                  :rules="valueRules"
+                  :init="tinymnc"
+                />
+                <!-- <ckeditor
+                  :editor="editor"
+                  v-model="doc.content"
                   :config="editorConfig"
                   :rules="valueRules"
-                ></ckeditor>
+                ></ckeditor> -->
                 <div
                   class="section-container mt-3 ml-10"
                   v-for="(sect, index) in doc.sections"
@@ -140,11 +147,18 @@
                         >
                       </div>
                     </v-row>
-                    <ckeditor
+                    <editor
+                  api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
+                  v-model="sect.content"
+                  :rules="valueRules"
+                  :init="tinymnc"
+                />
+                    <!-- <ckeditor
+                      :editor="editor"
                       v-model="sect.content"
                       :config="editorConfig"
                       :rules="valueRules"
-                    ></ckeditor>
+                    ></ckeditor> -->
 
                     <div
                       class="sub-section-container mt-3 ml-10"
@@ -177,12 +191,18 @@
                             >
                           </div>
                         </v-row>
-
-                        <ckeditor
+<editor
+                  api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
+                  v-model="subsect.content"
+                  :rules="valueRules"
+                  :init="tinymnc"
+                />
+                        <!-- <ckeditor
+                          :editor="editor"
                           v-model="subsect.content"
                           :config="editorConfig"
                           :rules="valueRules"
-                        ></ckeditor>
+                        ></ckeditor> -->
                       </v-card-text>
                     </div>
                     <v-row class="mt-3">
@@ -281,21 +301,38 @@
 </template>
 
 <script>
-
 var timeIntervalID;
-export default {
-  data: () => ({
-    editorConfig: {
-      // contentsCss: [
-      //   "http://cdn.ckeditor.com/4.17.1/full-all/contents.css",
-      //   "https://ckeditor.com/docs/ckeditor4/4.17.1/examples/assets/css/classic.css",
-      // ],
-      //src/components/document-settings/upload.php
-      filebrowserBrowseUrl: 'ckfinder/ckfinder.html',
-      filebrowserImageBrowseUrl: 'ckfinder/ckfinder.html?type=Images',
-      filebrowserUploadUrl: 'ckfinder/core/connector/php/connector.php',
-      filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php',
 
+
+import Editor from "@tinymce/tinymce-vue";
+
+export default {
+  components: {
+    editor: Editor,
+  },
+  data: () => ({
+    tinymnc: {
+      images_upload_url: "postAcceptor.php",
+      automatic_uploads: false,
+      height: 500,
+      menubar: false,
+      plugins: [
+        "advlist autolink lists link image charmap print preview anchor",
+        "searchreplace visualblocks code fullscreen",
+        "insertdatetime media table paste code help wordcount",
+      ],
+      toolbar:
+        "undo redo | formatselect | bold italic underline backcolor | \
+           alignleft aligncenter alignright alignjustify | image bullist numlist outdent indent table | removeformat code | help",
+    },
+   
+
+    editorConfig: {
+      ckfinder: {
+        // Upload the images to the server using the CKFinder QuickUpload command.
+        uploadUrl:
+          "https://example.com/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images&responseType=json",
+      },
     },
     items: [],
     valueRules: window.valueRules,
@@ -307,7 +344,7 @@ export default {
     snacktext: null,
     search: null,
     searched: [],
-    view_document:null,
+    view_document: null,
     timeout: 5000,
     menucontent: [],
     documentation_title: null,
@@ -329,7 +366,7 @@ export default {
           item;
           this.searched = [];
           localStorage.setItem("view-document", JSON.stringify(item));
-          window.location.href = "/documentation-view"
+          window.location.href = "/documentation-view";
         }
       }
     },
@@ -418,7 +455,7 @@ export default {
         content: null,
       });
     },
- 
+
     removeSubSection(docindex, index, i) {
       this.documentation[docindex].sections[index].sub_section.splice(i, 1);
     },
@@ -457,6 +494,7 @@ export default {
         });
     },
   },
+
   destroyed() {
     clearInterval(timeIntervalID);
   },
@@ -469,42 +507,38 @@ export default {
     this.setTimeIntervalForCaching();
   },
 };
-export class UploadAdapter
-{ 
-  
-    constructor (loader)
-    {
-        // The file loader instance to use during the upload.
-        this.loader = loader;
-    }
+export class UploadAdapter {
+  constructor(loader) {
+    // The file loader instance to use during the upload.
+    this.loader = loader;
+  }
 
-    // Starts the upload process.
-    upload ()
-    {
-        return this.loader.file
-           .then( file => new Promise( ( resolve, reject ) => {
-                 var myReader= new FileReader();
-                 myReader.onloadend = () => {
-                    resolve({ default: myReader.result });
-                 }
+  // Starts the upload process.
+  upload() {
+    return this.loader.file.then(
+      (file) =>
+        new Promise((resolve, reject) => {
+          var myReader = new FileReader();
+          myReader.onloadend = () => {
+            resolve({ default: myReader.result });
+          };
 
-                 myReader.readAsDataURL(file);
+          myReader.readAsDataURL(file);
 
-                 console.log(reject)
-           } ) );
-    }
+          console.log(reject);
+        })
+    );
+  }
 
-    // Aborts the upload process.
-    abort ()
-    {
-         //
-    }
+  // Aborts the upload process.
+  abort() {
+    //
+  }
 }
 
-export const uploader = function (editor)
-{
-    editor.plugins.get('FileRepository').createUploadAdapter = (loader) =>
-        new UploadAdapter(loader);
+export const uploader = function (editor) {
+  editor.plugins.get("FileRepository").createUploadAdapter = (loader) =>
+    new UploadAdapter(loader);
 };
 </script>
 

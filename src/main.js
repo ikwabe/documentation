@@ -10,7 +10,8 @@ import axios from "axios"
 import HorizontalNavBar from './components/nav-bar/Horizontal.vue'
 
 //importing CKEditor
-import CKEditor from 'ckeditor4-vue';
+//import CKEditor from 'ckeditor4-vue';
+
 
 Vue.prototype.$axios = axios;
 axios.defaults.headers = { 'Authorization': "Bearer " + window.localStorage.getItem('token') }
@@ -28,7 +29,12 @@ window.dept_id = '';
 //REMOVING OR MODIFYING THIS SECTION MAY AFFECT MOST OF THE PAGES 
 //registering horizontal nav bar
 Vue.component('horizontal-nav-bar', HorizontalNavBar)
+
+import CKEditor from '@ckeditor/ckeditor5-vue2';
 Vue.use(CKEditor);
+
+
+
 Vue.use(Vuetify)
 
 
