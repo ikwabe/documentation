@@ -91,7 +91,7 @@
         </v-col>
 
         <v-col v-if="view_document" cols="12" sm="10" lg="8" md="8">
-          <h1 v-if="view_document">{{ view_document.name }}</h1>
+          <h1 v-if="view_document">{{ view_document.name }} <v-chip dark class="ml-1" x-small color="grey">Created by: {{view_document.created_by}}</v-chip></h1>
 
           <v-col v-for="(sect, index) in view_document.content" :key="index">
             <v-col v-html="sect.contents"></v-col>
@@ -209,6 +209,8 @@ export default {
         if (item.doc_index >= 0) {
           this.view_document = item;
           this.searched = [];
+
+          
           // this.page_tittle = item.name;
           // this.content = this.documents[item.doc_index].content;
           // this.selected_index = item.doc_index;

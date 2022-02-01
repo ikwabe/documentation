@@ -110,12 +110,7 @@
                   :rules="valueRules"
                   :init="tinymnc"
                 />
-                <!-- <ckeditor
-                  :editor="editor"
-                  v-model="doc.content"
-                  :config="editorConfig"
-                  :rules="valueRules"
-                ></ckeditor> -->
+
                 <div
                   class="section-container mt-3 ml-10"
                   v-for="(sect, index) in doc.sections"
@@ -148,17 +143,11 @@
                       </div>
                     </v-row>
                     <editor
-                  api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
-                  v-model="sect.content"
-                  :rules="valueRules"
-                  :init="tinymnc"
-                />
-                    <!-- <ckeditor
-                      :editor="editor"
+                      api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
                       v-model="sect.content"
-                      :config="editorConfig"
                       :rules="valueRules"
-                    ></ckeditor> -->
+                      :init="tinymnc"
+                    />
 
                     <div
                       class="sub-section-container mt-3 ml-10"
@@ -191,18 +180,12 @@
                             >
                           </div>
                         </v-row>
-<editor
-                  api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
-                  v-model="subsect.content"
-                  :rules="valueRules"
-                  :init="tinymnc"
-                />
-                        <!-- <ckeditor
-                          :editor="editor"
+                        <editor
+                          api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
                           v-model="subsect.content"
-                          :config="editorConfig"
                           :rules="valueRules"
-                        ></ckeditor> -->
+                          :init="tinymnc"
+                        />
                       </v-card-text>
                     </div>
                     <v-row class="mt-3">
@@ -303,7 +286,6 @@
 <script>
 var timeIntervalID;
 
-
 import Editor from "@tinymce/tinymce-vue";
 
 export default {
@@ -325,15 +307,7 @@ export default {
         "undo redo | formatselect | bold italic underline backcolor | \
            alignleft aligncenter alignright alignjustify | image bullist numlist outdent indent table | removeformat code | help",
     },
-   
 
-    editorConfig: {
-      ckfinder: {
-        // Upload the images to the server using the CKFinder QuickUpload command.
-        uploadUrl:
-          "https://example.com/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images&responseType=json",
-      },
-    },
     items: [],
     valueRules: window.valueRules,
     valid: true,

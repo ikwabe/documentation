@@ -30,10 +30,6 @@ window.dept_id = '';
 //registering horizontal nav bar
 Vue.component('horizontal-nav-bar', HorizontalNavBar)
 
-import CKEditor from '@ckeditor/ckeditor5-vue2';
-Vue.use(CKEditor);
-
-
 
 Vue.use(Vuetify)
 
