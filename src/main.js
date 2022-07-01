@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
-import routes from './routes.ts';
+import routes from './routes.js';
 import axios from "axios"
 
 
@@ -17,11 +17,11 @@ Vue.prototype.$axios = axios;
 axios.defaults.headers = { 'Authorization': "Bearer " + window.localStorage.getItem('token') }
     //axios.defaults.headers = { 'Authorization': "Basic " + process.env.VUE_APP_ACCESS_TOKEN }
 
-var base_url = "127.0.0.1:8000";
+var base_url = process.env.VUE_APP_REMOTE_URL;
 //window.location.host; //http://127.0.0.1:8000
-window.api_url = "http://" + base_url + "/api/v1/";
-window.site_url = "http://" + base_url;
-window.img_url = "http://" + base_url;
+window.api_url = `${base_url}/api/v1/`;
+window.site_url = `${base_url}`;
+window.img_url = `${base_url}`;
 window.username = '';
 window.dept_id = '';
 

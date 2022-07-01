@@ -1,37 +1,40 @@
 <template>
   <v-app>
-    <horizontal-nav-bar
-      :page_tittle="'Prepare Documentation'"
-      :menuoption="items"
-    ></horizontal-nav-bar>
-    <v-navigation-drawer app dark color="primary">
-      <v-card-title class="white--text"> Documentation </v-card-title>
+    <v-app-bar app elevate-on-scroll clipped-right color="white">
+      <v-app-bar-nav-icon @click="nav_model = !nav_model"></v-app-bar-nav-icon>
+      <h3 class="ml-4 hide-on-mobile" style="color: #0847a9">Prepare Documentation</h3>
+      <v-spacer></v-spacer>
 
-      <v-treeview
-        hoverable
-        :items="menucontent"
-        item-children="document"
-        activatable
-        color="white"
-        open-on-click
-        return-object
-        transition
-        @click.stop=""
-      >
+      <v-menu transition="scale-transition" offset-y bottom max-height="300" open-on-hover>
+        <template v-slot:activator="{ on, attrs }">
+          <v-avatar v-on="on" v-bind="attrs" color="#F5F5F5" class="margin-right">
+            <!-- <v-img src="../profile.jpg"></v-img> -->
+            <h3>{{ String(username).slice(0, 1) }}</h3>
+          </v-avatar>
+        </template>
+        <v-card-text style="background-color: white">{{
+            username
+        }}</v-card-text>
+        <v-btn block tile light elevation="0" @click="logOut()" class="menu">
+          <v-icon>mdi-logout</v-icon> Log out<v-spacer></v-spacer>
+        </v-btn>
+      </v-menu>
+    </v-app-bar>
+
+    <v-navigation-drawer v-model="nav_model" app dark color="primary">
+      <v-card-title class="white--text"> Knowledge Base </v-card-title>
+
+      <v-treeview hoverable :items="menucontent" item-children="document" activatable color="white" open-on-click
+        return-object transition @click.stop="">
         <template slot="label" slot-scope="{ item }">
           <a style="color: white" @click="showItem(item)">{{ item.name }}</a>
-        </template></v-treeview
-      ></v-navigation-drawer
-    >
+        </template>
+      </v-treeview>
+    </v-navigation-drawer>
     <v-dialog persistent v-model="overlay">
       <v-row justify="center">
         <div class="col-10 col-md-6 col-sm-8 col-lg-6">
-          <v-progress-linear
-            color="primary"
-            indeterminate
-            rounded
-            height="10"
-          ></v-progress-linear>
+          <v-progress-linear color="primary" indeterminate rounded height="10"></v-progress-linear>
         </div>
       </v-row>
     </v-dialog>
@@ -42,184 +45,97 @@
             <v-card tile>
               <v-card-text>
                 <v-row class="col-12">
-                  <!-- <div class="col-12 col-md-4 col-lg-4 col-sm-4">
-              <v-select
-                outlined
-                :rules="valueRules"
-                dense
-                :items="departments"
-                item-value="id"
-                item-text="name"
-                v-model="department_id"
-                label="Department"
-                hide-details
-               
-                single-line
-              ></v-select>
-            </div> -->
-                  <div class="col-12 col-md-8 col-lg-6 col-sm-6">
-                    <v-text-field
-                      outlined
-                      :rules="valueRules"
-                      dense
-                      v-model="documentation_title"
-                      label="Document title"
-                      hide-details
-                      single-line
-                    ></v-text-field>
+                  <div class="col-12 col-md-4 col-lg-4 col-sm-4">
+                    <v-select outlined :rules="valueRules" dense :items="departments" item-value="id" item-text="name"
+                      v-model="department_id" label="Department" hide-details single-line></v-select>
+                  </div>
+                  <div class="col-12 col-md-6 col-lg-6 col-sm-6">
+                    <v-text-field outlined :rules="valueRules" dense v-model="documentation_title"
+                      label="Document title" hide-details single-line></v-text-field>
                   </div>
                   <div class="col-12 col-md-2 col-lg-2 col-sm-2">
-                    <v-btn
-                      color="primary"
-                      class="menu"
-                      elevation="0"
-                      block
-                      type="submit"
-                      >Save</v-btn
-                    >
+                    <v-row>
+                      <div class="col-8">
+                        <v-btn color="primary" class="menu" elevation="0" block @click.stop="" type="submit">Save
+                        </v-btn>
+                      </div>
+                      <div class="col-4">
+                        <v-btn @click="showdialog = true" icon elevation="0" outlined>
+                          <v-icon>mdi-upload</v-icon>
+                        </v-btn>
+
+                      </div>
+
+
+                    </v-row>
                   </div>
                 </v-row>
-                <p>
-                  You can add sections and sub sections for your documentation.
-                  <span class="red--text"
-                    >Green backgrounded part are for sections and Red
-                    backgrounded parts are for sub-sections</span
-                  >
-                </p>
+                <v-row>
+                  <v-chip close @click:close="removeFile(index)" v-for="(file, index) in file_attachments" :key="index">
+                    {{ file.title }}</v-chip>
+                </v-row>
               </v-card-text>
             </v-card>
             <div class="document-container">
-              <v-card-text
-                v-for="(doc, docindex) in documentation"
-                :key="docindex"
-              >
+              <v-card-text v-for="(doc, docindex) in documentation" :key="docindex">
                 <div class="col-12" align="right" v-if="docindex > 0">
-                  <v-btn
-                    text
-                    color="error"
-                    class="menu"
-                    elevation="0"
-                    @click="removeMainSection(docindex)"
-                    >Remove</v-btn
-                  >
+                  <v-btn text color="error" class="menu" elevation="0" @click="removeMainSection(docindex)">Remove
+                  </v-btn>
                 </div>
 
-                <editor
-                  api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
-                  v-model="doc.content"
-                  :rules="valueRules"
-                  :init="tinymnc"
-                />
+                <editor api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop" v-model="doc.content"
+                  :rules="valueRules" :init="tinymnc" />
 
-                <div
-                  class="section-container mt-3 ml-10"
-                  v-for="(sect, index) in doc.sections"
-                  :key="index"
-                >
+                <div class="section-container mt-3 ml-10" v-for="(sect, index) in doc.sections" :key="index">
                   <v-card-text>
                     <v-row class="col-12">
                       <div class="col-12 col-md-4 col-lg-4">
                         <p>Document Section {{ index + 1 }}</p>
                       </div>
                       <div class="col-12 col-md-7 col-lg-7">
-                        <v-text-field
-                          outlined
-                          :rules="valueRules"
-                          v-model="sect.title"
-                          @keyup="cacheData"
-                          dense
-                          label="Section title"
-                        ></v-text-field>
+                        <v-text-field outlined :rules="valueRules" v-model="sect.title" @keyup="cacheData" dense
+                          label="Section title"></v-text-field>
                       </div>
                       <div class="col-12 col-md-1 col-lg-1">
-                        <v-btn
-                          text
-                          color="error"
-                          elevation="0"
-                          class="menu"
-                          @click="removeSection(index)"
-                          >Remove</v-btn
-                        >
+                        <v-btn text color="error" elevation="0" class="menu" @click="removeSection(index)">Remove
+                        </v-btn>
                       </div>
                     </v-row>
-                    <editor
-                      api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
-                      v-model="sect.content"
-                      :rules="valueRules"
-                      :init="tinymnc"
-                    />
+                    <editor api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop" v-model="sect.content"
+                      :rules="valueRules" :init="tinymnc" />
 
-                    <div
-                      class="sub-section-container mt-3 ml-10"
-                      v-for="(subsect, i) in sect.sub_section"
-                      :key="i"
-                    >
+                    <div class="sub-section-container mt-3 ml-10" v-for="(subsect, i) in sect.sub_section" :key="i">
                       <v-card-text>
                         <v-row class="col-12">
                           <div class="col-12 col-md-4 col-lg-4">
                             <p>Sub Section {{ i + 1 }}</p>
                           </div>
                           <div class="col-12 col-md-7 col-lg-7">
-                            <v-text-field
-                              outlined
-                              :rules="valueRules"
-                              @keyup="cacheData"
-                              v-model="subsect.title"
-                              dense
-                              label="Sub Section title"
-                            ></v-text-field>
+                            <v-text-field outlined :rules="valueRules" @keyup="cacheData" v-model="subsect.title" dense
+                              label="Sub Section title"></v-text-field>
                           </div>
                           <div class="col-12 col-md-1 col-lg-1">
-                            <v-btn
-                              text
-                              color="error"
-                              class="menu"
-                              elevation="0"
-                              @click="removeSubSection(docindex, index, i)"
-                              >Remove</v-btn
-                            >
+                            <v-btn text color="error" class="menu" elevation="0"
+                              @click="removeSubSection(docindex, index, i)">Remove</v-btn>
                           </div>
                         </v-row>
-                        <editor
-                          api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop"
-                          v-model="subsect.content"
-                          :rules="valueRules"
-                          :init="tinymnc"
-                        />
+                        <editor api-key="7huqtk7r95ignuh0b10vl6apfu1pe3n2bdbog1ofuzrwvbop" v-model="subsect.content"
+                          :rules="valueRules" :init="tinymnc" />
                       </v-card-text>
                     </div>
                     <v-row class="mt-3">
                       <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        class="menu"
-                        elevation="0"
-                        color="purple"
-                        @click="addSubSection(docindex, index)"
-                        >Add sub sub section</v-btn
-                      >
+                      <v-btn text class="menu" elevation="0" color="purple" @click="addSubSection(docindex, index)">Add
+                        sub sub section</v-btn>
                     </v-row>
                   </v-card-text>
                 </div>
                 <v-row justify="center" class="mt-3 mb-4">
-                  <v-btn
-                    text
-                    color="purple"
-                    class="menu"
-                    elevation="0"
-                    @click="addSection(docindex)"
-                    >Add sub section</v-btn
-                  >
+                  <v-btn text color="purple" class="menu" elevation="0" @click="addSection(docindex)">Add sub section
+                  </v-btn>
                 </v-row>
                 <div class="text-center">
-                  <v-snackbar
-                    v-model="snackbar"
-                    :timeout="timeout"
-                    dark
-                    top
-                    elevation="8"
-                    color="error"
-                  >
+                  <v-snackbar v-model="snackbar" :timeout="timeout" dark top elevation="8" color="error">
                     {{ snacktext }}
                     <template v-slot:action="{ attrs }">
                       <v-btn dark icon v-bind="attrs" @click="snackbar = false">
@@ -229,55 +145,53 @@
                   </v-snackbar>
                 </div>
                 <v-row justify="start" class="mt-3 mb-4 ml-3">
-                  <v-btn
-                    text
-                    class="menu"
-                    color="purple"
-                    elevation="0"
-                    @click="addMainSection"
-                    >Add main section</v-btn
-                  >
+                  <v-btn text class="menu" color="purple" elevation="0" @click="addMainSection">Add main section</v-btn>
                 </v-row>
               </v-card-text>
             </div>
           </v-form>
         </v-col>
         <center v-else class="other-pannel">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </center>
       </div>
       <div class="col-12 col-md-6 col-lg-6 search-panel">
         <v-card-text>
-          <v-text-field
-            light
-            solo
-            v-model="search"
-            dense
-            placeholder="Search document"
-            append-icon="mdi-magnify"
-            hide-details=""
-            style="
+          <v-text-field light solo v-model="search" dense placeholder="Search document" append-icon="mdi-magnify"
+            hide-details="" style="
               border-bottom-left-radius: 0px;
               border-bottom-right-radius: 0px;
-            "
-            @keyup="searchDocument"
-          ></v-text-field>
+            " @keyup="searchDocument"></v-text-field>
           <v-card tile v-show="searched.length > 0" elevation="1">
-            <v-btn
-              class="menu"
-              @click="showItem(doc)"
-              v-for="(doc, index) in searched"
-              :key="index"
-              text
-              block
-              tile
-              >{{ doc.name }} <v-spacer></v-spacer
-            ></v-btn>
+            <v-btn class="menu" @click="showItem(doc)" v-for="(doc, index) in searched" :key="index" text block tile>{{
+                doc.name
+            }} <v-spacer></v-spacer>
+            </v-btn>
           </v-card>
         </v-card-text>
+        <v-dialog :max-width="maxwidth" v-model="showdialog">
+          <v-card>
+            <v-card-title>
+              Upload file <v-spacer></v-spacer>
+              <v-btn icon elevation="0" @click="showdialog = false" outlined>
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <v-text-field outlined :rules="valueRules" dense v-model="file_title" label="File title" single-line>
+              </v-text-field>
+              <v-file-input prepend-icon="" prepend-inner-icon="mdi-attachment" v-model="file_upload"
+                @input="showdialog = false" dense outlined label="Upload file">
+
+              </v-file-input>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn :disabled="file_upload == null" elevation="0" @click="attachFile()" color="primary">Add
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </div>
     </v-main>
   </v-app>
@@ -293,6 +207,13 @@ export default {
     editor: Editor,
   },
   data: () => ({
+    nav_model: null,
+    username: window.username,
+    file_attachments: [],
+    file_upload: null,
+    file_title: "My file",
+    showdialog: false,
+    maxwidth: "50%",
     tinymnc: {
       images_upload_url: "postAcceptor.php",
       automatic_uploads: false,
@@ -334,12 +255,38 @@ export default {
   }),
 
   methods: {
+    logOut() {
+      let url = window.api_url + "logout";
+
+      this.overlay = true;
+
+      this.$axios
+        .post(url)
+        .then((response) => {
+          if (response.data.success) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("name");
+            localStorage.removeItem("dept_id");
+
+            window.location.href = "/";
+          }
+
+        })
+        .catch(() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("name");
+          localStorage.removeItem("dept_id");
+          window.location.href = "/";
+          this.overlay = false;
+        });
+    },
     showItem(item) {
       if (item) {
         if (item.doc_index >= 0) {
           item;
           this.searched = [];
           localStorage.setItem("view-document", JSON.stringify(item));
+
           window.location.href = "/documentation-view";
         }
       }
@@ -446,18 +393,35 @@ export default {
         })
         .catch(() => {
           this.isLoading = false;
+        }).finally(() => {
+          this.isLoading = false;
         });
+    },
+    attachFile() {
+      this.file_attachments = [];
+      let file = { title: this.file_title, file: this.file_upload }
+      this.file_attachments.push(file);
+      this.showdialog = false;
+
+    },
+    removeFile(index) {
+      this.file_attachments.splice(index, 1);
+
+      this.file_upload = null;
+      this.file_title = 'My file';
     },
     saveDocument() {
       this.isLoading = true;
 
       let url = window.api_url + "add-document";
+      let formdata = new FormData();
+      formdata.append('document', JSON.stringify(this.documentation));
+      formdata.append('dept_id', this.department_id);
+      formdata.append('title', this.documentation_title);
+      formdata.append('file_title', this.file_title);
+      formdata.append('file', this.file_upload);
       this.$axios
-        .post(url, {
-          document: JSON.stringify(this.documentation),
-          dept_id: this.department_id,
-          title: this.documentation_title,
-        })
+        .post(url, formdata)
         .then((response) => {
           if (response.data.success) {
             this.isLoading = false;
@@ -474,7 +438,7 @@ export default {
   },
   created() {
     this.getDocuments();
-
+    this.getDepartiments();
     if (JSON.parse(localStorage.getItem("temp-document"))) {
       this.documentation = JSON.parse(localStorage.getItem("temp-document"));
     }
@@ -523,6 +487,7 @@ export const uploader = function (editor) {
   overflow-x: hidden;
   height: 75vh;
 }
+
 .section-container {
   background-color: rgba(126, 207, 126, 0.1);
 }
@@ -534,11 +499,13 @@ export const uploader = function (editor) {
 .main {
   position: relative;
 }
+
 .search-pannel {
   position: absolute;
   left: 10px;
   top: 10px;
 }
+
 .other-pannel {
   position: absolute;
   left: 10px;
